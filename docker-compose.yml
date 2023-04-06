@@ -1,0 +1,43 @@
+version: '3.4'
+
+services:
+  api:
+    container_name: api.mg-dashboard
+    image: mcr.microsoft.com/dotnet/sdk:6.0
+    depends_on:
+      - database
+
+    working_dir: /home/api
+    volumes:
+      - ./api:/home/api/build
+    ports:
+      - '44364:44364'
+      - '59518:59518'
+      - '5000:5000'
+    environment:
+      ASPNETCORE_URLS: http://+:5000 
+    command: bash -c 'dotnet publish build/MG.Dashboard.Api/MG.Dashboard.Api.csproj -c Release -o app && dotnet app/MG.Dashboard.Api.dll'
+
+  mqtt:
+    container_name: mqtt.mg-dashboard
+    image: mcr.microsoft.com/dotnet/sdk:6.0
+
+    working_dir: /home/mqtt
+    volumes:
+      - ./mqtt-server:/home/mqtt/build
+    ports:
+      - '1883:1883'
+    command: bash -c 'dotnet publish build/MG.Dashboard.Mqtt.Server/MG.Dashboard.Mqtt.Server.csproj -c Release -o app && dotnet app/MG.Dashboard.Mqtt.Server.dll'
+
+  database:
+    container_name: db.mg-dashboard
+    image: postgres
+
+    working_dir: /home/db
+    volumes:
+      - ./db/data:/var/lib/db/data
+    restart: always
+    environment:
+      POSTGRES_USER: test-user
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydb
