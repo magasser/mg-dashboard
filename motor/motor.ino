@@ -13,9 +13,6 @@
 #define THROTTLE_PIN_1 24
 #define THROTTLE_PIN_2 25
 
-#define ACK_PREFIX ACK_MESSAGE "."
-#define ACK_CON ACK_PREFIX CON_MESSAGE
-
 Engine engine(STEER_PIN_1, STEER_PIN_2, THROTTLE_PIN_1, THROTTLE_PIN_2);
 Controller controller(engine);
 SerialConnection connection(Serial, SERIAL_BAUD_RATE, SERIAL_TIMEOUT);
@@ -39,7 +36,7 @@ void serialEvent() {
     Message message(value);
 
     if (message.type.equals(CON_MESSAGE)) {
-      connection.write(ACK_CON);
+      sendAckMessage(CON_MESSAGE);
     } else if (message.type.equals(CMD_MESSAGE)) {
       executeCommand(message);
     } else if (message.type.equals(MSG_MESSAGE)) {
@@ -54,6 +51,12 @@ void serialEvent() {
 
 void executeCommand(const Message& command) {  
   if (controller.execute(command.parameters, command.parameterCount)) {
-    connection.write(ACK_PREFIX + command.type + '.' + command.parameters[0]);
+    sendAckMessage(command.type + PARAMETER_SEPARATOR + command.parameters[0]);
   }
+}
+
+// TODO: improve this
+void sendAckMessage(String message) {
+  String ackMessage = String(ACK_MESSAGE) + TYPE_SEPARATOR + message + MESSAGE_SEPARATOR;
+  connection.write(ackMessage);
 }
