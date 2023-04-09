@@ -4,6 +4,8 @@ public sealed record MqttClientConfiguration
 {
     public const string Key = "MqttClientConfiguration";
 
+    public string ClientId { get; init; }
+
     public string Host { get; init; }
 
     public int Port { get; init; }

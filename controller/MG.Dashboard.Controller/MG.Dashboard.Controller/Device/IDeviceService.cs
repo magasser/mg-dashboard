@@ -8,9 +8,11 @@ public interface IDeviceService
 
     IObservable<DeviceMode> Mode { get; }
 
-    IObservable<string> Messages { get; }
+    IObservable<Message> DeviceMessages { get; }
 
-    Task SendMessageAsync(string message, CancellationToken cancellationToken = default);
+    IObservable<Message> ExternalMessages { get; }
+
+    Task SendDeviceMessageAsync(Message message, CancellationToken cancellationToken = default);
 
     Task StartAsync(CancellationToken cancellationToken = default);
 

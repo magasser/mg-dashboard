@@ -3,6 +3,6 @@
 public enum DeviceState
 {
     Unkown = 0,
-    Connected = 1,
-    Disconnected = 2
+    Running = 1,
+    Error = 2
 }

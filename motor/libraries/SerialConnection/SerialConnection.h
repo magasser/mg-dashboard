@@ -1,17 +1,22 @@
 #ifndef SerialConnection_h
 #define SerialConnection_h
 
+#include "Arduino.h"
+
 class SerialConnection
 {
 public:
-    SerialConnection(Serial_ &serial, int speed, int timeout);
-    int connect() const;
-    int available() const;
-    int write(const char *payload) const;
-    const char *readUntil(char terminator) const;
+    SerialConnection(HardwareSerial &serial, uint32_t speed, uint32_t timeout);
+    void init() const;
+    bool connect() const;
+    bool dataAvailable() const;
+    bool write(String payload) const;
+    String readUntil(char terminator) const;
 
 private:
-    Serial_ *m_Serial;
+    uint32_t m_Speed;
+    uint32_t m_Timeout;
+    HardwareSerial *m_Serial;
 };
 
 #endif

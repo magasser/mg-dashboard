@@ -1,6 +1,10 @@
 ﻿using System.Reactive.Linq;
 using System.Reactive.Subjects;
 
+using MG.Dashboard.Controller.Options;
+
+using Microsoft.Extensions.Options;
+
 using MQTTnet;
 using MQTTnet.Client;
 using MQTTnet.Extensions.ManagedClient;
@@ -11,23 +15,31 @@ namespace MG.Dashboard.Controller.Mqtt;
 public sealed class MqttClientService : IMqttClientService, IDisposable
 {
     private readonly ILogger<MqttClientService> _logger;
+    private readonly MqttClientConfiguration _configuration;
     private readonly IManagedMqttClient _client;
     private readonly ManagedMqttClientOptions _clientOptions;
 
     private readonly BehaviorSubject<bool> _isConnectedSubject;
     private readonly Dictionary<string, List<ReplaySubject<string>>> _topicSubscriptions;
 
-    public MqttClientService(
-        ILogger<MqttClientService> logger,
-        IManagedMqttClient client,
-        ManagedMqttClientOptions clientOptions)
+    public MqttClientService(ILogger<MqttClientService> logger, IOptions<MqttClientConfiguration> options)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _client = client ?? throw new ArgumentNullException(nameof(client));
-        _clientOptions = clientOptions ?? throw new ArgumentNullException(nameof(clientOptions));
+        _configuration = options?.Value ?? throw new ArgumentNullException(nameof(options));
 
         _isConnectedSubject = new BehaviorSubject<bool>(false);
         _topicSubscriptions = new Dictionary<string, List<ReplaySubject<string>>>();
+
+        _clientOptions = new ManagedMqttClientOptionsBuilder()
+                         .WithAutoReconnectDelay(TimeSpan.FromSeconds(_configuration.ReconnectDelay))
+                         .WithClientOptions(
+                             new MqttClientOptionsBuilder()
+                                 .WithClientId(_configuration.ClientId)
+                                 .WithTcpServer($"{_configuration.Host}:{_configuration.Port}")
+                                 .Build())
+                         .Build();
+
+        _client = new MqttFactory().CreateManagedMqttClient();
 
         IsConnected = _isConnectedSubject.AsObservable();
 
