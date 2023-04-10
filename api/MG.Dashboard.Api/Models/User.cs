@@ -13,6 +13,9 @@ public sealed record User
     [JsonPropertyName("password")]
     public string Password { get; set; }
 
+    [JsonPropertyName("token")]
+    public string? Token { get; set; }
+
     [JsonPropertyName("accessKey")]
     public string? AccessKey { get; set; }
 }

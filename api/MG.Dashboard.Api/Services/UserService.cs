@@ -1,5 +1,6 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 using MG.Dashboard.Api.Context;
@@ -31,13 +32,22 @@ public sealed class UserService : IUserService
     }
 
     /// <inheritdoc />
-    public async Task<string?> SignIn(User user)
+    public async Task<User?> SignIn(User user)
     {
         var context = new MgDashboardContext();
 
-        var isValidUser = await context.Users.AnyAsync(u => u.Name == user.Name && u.Password == user.Password).ConfigureAwait(false);
+        var passwordHash = CreateHash(user.Password);
 
-        return isValidUser ? CreateToken(user) : null;
+        var userEntity = await context.Users.FirstOrDefaultAsync(u => u.Name == user.Name && u.Password == passwordHash).ConfigureAwait(false);
+
+        var token = userEntity is not null ? CreateToken(user) : null;
+
+        return new User
+        {
+            Id = userEntity!.Id,
+            Name = userEntity.Name,
+            Token = token
+        };
     }
 
     /// <inheritdoc />
@@ -52,12 +62,14 @@ public sealed class UserService : IUserService
             return false;
         }
 
+        var passwordHash = CreateHash(user.Password);
+
         await context.Users.AddAsync(
                          new Entities.UserEntity
                          {
                              Id = Guid.NewGuid(),
                              Name = user.Name,
-                             Password = user.Password,
+                             Password = passwordHash,
                              AccessKeyId = accessKey.Id
                          })
                      .ConfigureAwait(false);
@@ -93,8 +105,22 @@ public sealed class UserService : IUserService
 
         var tokenHandler = new JwtSecurityTokenHandler();
         var token = tokenHandler.CreateToken(tokenDescriptor);
-        var jwtToken = tokenHandler.WriteToken(token);
+        return tokenHandler.WriteToken(token);
+    }
 
-        return jwtToken;
+    private string CreateHash(string password)
+    {
+        const int keySize = 64;
+        const int iterations = 333333;
+        var salt = Environment.GetEnvironmentVariable("HASH_SALT");
+
+        var key = Rfc2898DeriveBytes.Pbkdf2(
+            Encoding.UTF8.GetBytes(password),
+            Encoding.UTF8.GetBytes(salt!),
+            iterations,
+            HashAlgorithmName.SHA512,
+            keySize);
+
+        return Convert.ToHexString(key);
     }
 }

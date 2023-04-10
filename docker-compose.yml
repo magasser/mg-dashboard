@@ -9,10 +9,10 @@ services:
 
     working_dir: /home/website
     ports:
-      - 4200:4200
+      - 80:80
     volumes:
       - ./website/frontend/mg-dashboard:/home/website
-    command: sh -c 'npm install -g @angular/cli@latest && npm install && npm run start'
+    command: sh -c 'npm install && npm run start'
     restart: always
 
   api:

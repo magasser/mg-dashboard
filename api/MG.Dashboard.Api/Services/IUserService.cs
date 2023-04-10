@@ -7,7 +7,7 @@ public interface IUserService
 {
     Task<User?> Get(Guid id);
 
-    Task<string?> SignIn(User user);
+    Task<User?> SignIn(User user);
 
     Task<bool> SignUp(User user);
 }

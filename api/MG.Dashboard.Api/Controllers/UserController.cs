@@ -23,16 +23,16 @@ public class UserController : ControllerBase
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [HttpPost("signin")]
-    public async Task<ActionResult<string>> SignIn([FromBody] User user)
+    public async Task<ActionResult<User>> SignIn([FromBody] User user)
     {
-        var token = await _userService.SignIn(user);
+        var foundUser = await _userService.SignIn(user);
 
-        if (token is null)
+        if (foundUser is null)
         {
             return Unauthorized();
         }
 
-        return Ok(token);
+        return Ok(foundUser);
     }
 
     [AllowAnonymous]
