@@ -16,6 +16,8 @@ internal sealed class MqttServerHostedService : IHostedService
 {
     private readonly MqttFactory _factory;
     private readonly MqttServer _server;
+    private readonly string _userName;
+    private readonly string _password;
 
     public MqttServerHostedService(IOptions<MqttServerConfiguration> options, MqttFactory factory)
     {
@@ -25,6 +27,9 @@ internal sealed class MqttServerHostedService : IHostedService
         }
 
         _factory= factory ?? throw new ArgumentNullException(nameof(factory));
+
+        _userName = Environment.GetEnvironmentVariable("MQTT_SERVER_USER")!;
+        _password = Environment.GetEnvironmentVariable("MQTT_SERVER_PASS")!;
 
         var serverOptions = _factory.CreateServerOptionsBuilder()
                               .WithDefaultEndpoint()
@@ -38,7 +43,7 @@ internal sealed class MqttServerHostedService : IHostedService
 
     private Task ValidateConnection(ValidatingConnectionEventArgs arg)
     {
-        if (arg.UserName != "test" || arg.Password != "test2")
+        if (arg.UserName != _userName || arg.Password != _password)
         {
             arg.ReasonCode = MqttConnectReasonCode.BadUserNameOrPassword;
         }

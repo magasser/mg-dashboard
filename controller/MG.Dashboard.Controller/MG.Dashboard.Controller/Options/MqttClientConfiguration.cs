@@ -6,9 +6,5 @@ public sealed record MqttClientConfiguration
 
     public string ClientId { get; init; }
 
-    public string Host { get; init; }
-
-    public int Port { get; init; }
-
     public int ReconnectDelay { get; init; } = 5;
 }

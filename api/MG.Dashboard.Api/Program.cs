@@ -1,4 +1,8 @@
+using MG.Dashboard.Env;
 using Serilog;
+
+DotEnv.Load(".env");
+DotEnv.Load(".env.development");
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,6 +10,8 @@ var logger = new LoggerConfiguration()
              .ReadFrom.Configuration(builder.Configuration)
              .Enrich.FromLogContext()
              .CreateLogger();
+
+builder.Configuration.AddEnvironmentVariables();
 
 builder.Logging
        .ClearProviders()

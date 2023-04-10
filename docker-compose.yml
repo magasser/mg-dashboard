@@ -1,6 +1,22 @@
 version: '3.4'
 
 services:
+  website:
+    container_name: website.mg-dashboard
+    depends_on:
+      - api
+    build:
+      context: angular
+      target: builder
+
+    working_dir: /home/website
+    env_file:
+      - ./website/frontend/mg-dashboard/.env
+    ports:
+      - 4200:4200
+    volumes:
+      - ./website/frontend/mg-dashboard:/home/website
+
   api:
     container_name: api.mg-dashboard
     image: mcr.microsoft.com/dotnet/sdk:6.0
@@ -8,11 +24,11 @@ services:
       - database
 
     working_dir: /home/api
+    env_file:
+      - ./api/MG.Bashboard.Api/.env
     volumes:
       - ./api:/home/api/build
     ports:
-      - '44364:44364'
-      - '59518:59518'
       - '5000:5000'
     environment:
       ASPNETCORE_URLS: http://+:5000 
@@ -23,6 +39,8 @@ services:
     image: mcr.microsoft.com/dotnet/sdk:6.0
 
     working_dir: /home/mqtt
+    env_file:
+      - ./mqtt-server/MG.Dashboard.Mqtt.Server/.env
     volumes:
       - ./mqtt-server:/home/mqtt/build
     ports:
@@ -34,8 +52,12 @@ services:
     image: postgres
 
     working_dir: /home/db
+    env_file:
+      - .env
     volumes:
       - ./db/data:/var/lib/db/data
+    ports:
+      - '5432:5432'
     restart: always
     environment:
       POSTGRES_USER: test-user

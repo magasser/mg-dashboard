@@ -21,6 +21,7 @@ public sealed class MqttClientService : IMqttClientService, IDisposable
 
     private readonly BehaviorSubject<bool> _isConnectedSubject;
     private readonly Dictionary<string, List<ReplaySubject<string>>> _topicSubscriptions;
+    private readonly string _connectionUri;
 
     public MqttClientService(ILogger<MqttClientService> logger, IOptions<MqttClientConfiguration> options)
     {
@@ -30,12 +31,14 @@ public sealed class MqttClientService : IMqttClientService, IDisposable
         _isConnectedSubject = new BehaviorSubject<bool>(false);
         _topicSubscriptions = new Dictionary<string, List<ReplaySubject<string>>>();
 
+        _connectionUri = Environment.GetEnvironmentVariable("MQTT_CONNECTION_URI")!;
+
         _clientOptions = new ManagedMqttClientOptionsBuilder()
                          .WithAutoReconnectDelay(TimeSpan.FromSeconds(_configuration.ReconnectDelay))
                          .WithClientOptions(
                              new MqttClientOptionsBuilder()
                                  .WithClientId(_configuration.ClientId)
-                                 .WithTcpServer($"{_configuration.Host}:{_configuration.Port}")
+                                 .WithConnectionUri(_connectionUri)
                                  .Build())
                          .Build();
 

@@ -18,6 +18,7 @@ public sealed class SerialService : ISerialService, IDisposable
     private readonly ReplaySubject<string> _messagesSubject;
     private readonly BehaviorSubject<bool> _isConnectedSubject;
     private readonly string _separator;
+    private readonly SemaphoreSlim _serialLock = new(initialCount: 1);
 
     private SerialPort? _serialPort;
     private CancellationTokenSource? _watchtogCancellationSource;
@@ -46,20 +47,22 @@ public sealed class SerialService : ISerialService, IDisposable
     public IObservable<string> Messages { get; }
 
     /// <inheritdoc />
-    public Task SendMessageAsync(string message, CancellationToken cancellationToken = default)
+    public async Task SendMessageAsync(string message, CancellationToken cancellationToken = default)
     {
         if (_serialPort?.IsOpen is not true)
         {
-            return Task.CompletedTask;
+            return;
         }
+
+        await _serialLock.WaitAsync().ConfigureAwait(false);
 
         _serialPort.Write(message);
 
-        return Task.CompletedTask;
+        _serialLock.Release();
     }
 
     /// <inheritdoc />
-    public Task StartAsync(CancellationToken cancellationToken = default)
+    public async Task StartAsync(CancellationToken cancellationToken = default)
     {
         var ports = SerialPort.GetPortNames();
 
@@ -72,8 +75,10 @@ public sealed class SerialService : ISerialService, IDisposable
         else if (ports.Length == 0)
         {
             _logger.LogError("No serial ports available for communication.");
-            return Task.CompletedTask;
+            return;
         }
+
+        await _serialLock.WaitAsync().ConfigureAwait(false);
 
         _serialPort = new SerialPort(ports[0], _configuration.BaudRate)
         {
@@ -91,8 +96,10 @@ public sealed class SerialService : ISerialService, IDisposable
         catch (Exception ex)
         {
             _logger.LogError("Error when trying to open serial port: {Message}.", ex.Message);
-            return Task.CompletedTask;
+            return;
         }
+
+        _serialLock.Release();
 
         _lastConnectionAcknowledgeReceived = DateTime.UtcNow;
         _watchtogCancellationSource = new CancellationTokenSource();
@@ -100,12 +107,16 @@ public sealed class SerialService : ISerialService, IDisposable
 
         _logger.LogDebug("Started Serial communication with port '{PortName}'.", _serialPort.PortName);
 
-        return Task.CompletedTask;
+        return;
     }
 
-    private void OnDataReceived(object sender, SerialDataReceivedEventArgs e)
+    private async void OnDataReceived(object sender, SerialDataReceivedEventArgs e)
     {
+        await _serialLock.WaitAsync().ConfigureAwait(false);
+
         var data = _serialPort!.ReadExisting();
+
+        _serialLock.Release();
 
         HandleExistingData(data);
     }
@@ -140,8 +151,10 @@ public sealed class SerialService : ISerialService, IDisposable
     }
 
     /// <inheritdoc />
-    public Task StopAsync(CancellationToken cancellationToken = default)
+    public async Task StopAsync(CancellationToken cancellationToken = default)
     {
+        await _serialLock.WaitAsync().ConfigureAwait(false);
+
         if (_serialPort is not null)
         {
             _serialPort.DataReceived -= OnDataReceived;
@@ -151,9 +164,11 @@ public sealed class SerialService : ISerialService, IDisposable
 
         _serialPort?.Close();
 
+        _serialLock.Release();
+
         _logger.LogDebug("Stopped Serial communication with port '{PortName}'.", _serialPort?.PortName);
 
-        return Task.CompletedTask;
+        return;
     }
 
     /// <inheritdoc />

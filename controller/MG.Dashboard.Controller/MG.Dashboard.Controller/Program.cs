@@ -3,8 +3,12 @@ using MG.Dashboard.Controller.Device;
 using MG.Dashboard.Controller.Mqtt;
 using MG.Dashboard.Controller.Options;
 using MG.Dashboard.Controller.Serial;
+using MG.Dashboard.Env;
 
 using Serilog;
+
+DotEnv.Load(".env");
+DotEnv.Load(".env.development");
 
 await Host.CreateDefaultBuilder()
           .ConfigureAppConfiguration(

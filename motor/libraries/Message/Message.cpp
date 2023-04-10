@@ -29,7 +29,7 @@ Message::Message(const String &value)
 
 Message::~Message()
 {
-    //delete[] parameters;
+    delete[] parameters;
 }
 
 String *Message::splitByChar(const String &value, char separator, uint8_t size) const
