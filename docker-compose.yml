@@ -3,19 +3,17 @@ version: '3.4'
 services:
   website:
     container_name: website.mg-dashboard
+    image: node:19-alpine
     depends_on:
       - api
-    build:
-      context: angular
-      target: builder
 
     working_dir: /home/website
-    env_file:
-      - ./website/frontend/mg-dashboard/.env
     ports:
       - 4200:4200
     volumes:
       - ./website/frontend/mg-dashboard:/home/website
+    command: sh -c 'npm install -g @angular/cli@latest && npm install && npm run start'
+    restart: always
 
   api:
     container_name: api.mg-dashboard
@@ -25,7 +23,7 @@ services:
 
     working_dir: /home/api
     env_file:
-      - ./api/MG.Bashboard.Api/.env
+      - ./api/MG.Dashboard.Api/.env
     volumes:
       - ./api:/home/api/build
     ports:
@@ -33,6 +31,7 @@ services:
     environment:
       ASPNETCORE_URLS: http://+:5000 
     command: bash -c 'dotnet publish build/MG.Dashboard.Api/MG.Dashboard.Api.csproj -c Release -o app && dotnet app/MG.Dashboard.Api.dll'
+    restart: always
 
   mqtt:
     container_name: mqtt.mg-dashboard
@@ -46,6 +45,7 @@ services:
     ports:
       - '1883:1883'
     command: bash -c 'dotnet publish build/MG.Dashboard.Mqtt.Server/MG.Dashboard.Mqtt.Server.csproj -c Release -o app && dotnet app/MG.Dashboard.Mqtt.Server.dll'
+    restart: always
 
   database:
     container_name: db.mg-dashboard
@@ -53,13 +53,26 @@ services:
 
     working_dir: /home/db
     env_file:
-      - .env
+      - ./db/.env
     volumes:
       - ./db/data:/var/lib/db/data
     ports:
       - '5432:5432'
     restart: always
-    environment:
-      POSTGRES_USER: test-user
-      POSTGRES_PASSWORD: mypassword
-      POSTGRES_DB: mydb
+
+  dbadmin:
+    container_name: dbadmin.mg-dashboard
+    image: dpage/pgadmin4:latest
+    depends_on:
+      - database
+
+    env_file:
+      - ./db/.env
+    ports:
+      - '5050:80'
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    restart: always
+
+volumes:
+    pgadmin-data:  

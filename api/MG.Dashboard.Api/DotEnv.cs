@@ -14,7 +14,7 @@ public static class DotEnv
 
         foreach (var line in File.ReadAllLines(file))
         {
-            var parts = line.Split('=', StringSplitOptions.RemoveEmptyEntries);
+            var parts = line.Split('=', count: 2, StringSplitOptions.RemoveEmptyEntries);
 
             if (parts.Length != 2)
             {
