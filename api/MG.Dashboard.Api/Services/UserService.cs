@@ -4,7 +4,10 @@ using System.Security.Cryptography;
 using System.Text;
 
 using MG.Dashboard.Api.Context;
+using MG.Dashboard.Api.Entities;
+using MG.Dashboard.Api.Entities.Types;
 using MG.Dashboard.Api.Models;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -12,19 +15,24 @@ namespace MG.Dashboard.Api.Services;
 
 public sealed class UserService : IUserService
 {
-    /// <inheritdoc />
-    public async Task<User?> Get(Guid id)
-    {
-        var context = new MgDashboardContext();
+    private readonly MgDashboardContext _context;
 
-        var user = await context.Users.FirstOrDefaultAsync(user => user.Id == id).ConfigureAwait(false);
+    public UserService(MgDashboardContext context)
+    {
+        _context = context ?? throw new ArgumentNullException(nameof(context));
+    }
+
+    /// <inheritdoc />
+    public async Task<UserModels.UserResponse?> GetByIdAsync(Guid id)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(user => user.Id == id).ConfigureAwait(false);
 
         if (user is null)
         {
             return null;
         }
 
-        return new User
+        return new UserModels.UserResponse
         {
             Id = user.Id,
             Name = user.Name
@@ -32,54 +40,64 @@ public sealed class UserService : IUserService
     }
 
     /// <inheritdoc />
-    public async Task<User?> SignIn(User user)
+    public async Task<UserModels.SignInResponse?> SignInAsync(UserModels.SignInRequest req)
     {
-        var context = new MgDashboardContext();
+        var passwordHash = CreateHash(req.Password);
 
-        var passwordHash = CreateHash(user.Password);
+        var userEntity = await _context.Users.FirstOrDefaultAsync(u => u.Name == req.Name && u.Password == passwordHash)
+                                       .ConfigureAwait(false);
 
-        var userEntity = await context.Users.FirstOrDefaultAsync(u => u.Name == user.Name && u.Password == passwordHash).ConfigureAwait(false);
-
-        var token = userEntity is not null ? CreateToken(user) : null;
-
-        return new User
-        {
-            Id = userEntity!.Id,
-            Name = userEntity.Name,
-            Token = token
-        };
+        return userEntity is not null
+                   ? new UserModels.SignInResponse
+                   {
+                       Id = userEntity!.Id,
+                       Token = CreateToken(req.Name)
+                   }
+                   : null;
     }
 
     /// <inheritdoc />
-    public async Task<bool> SignUp(User user)
+    public async Task<UserModels.SignInResponse?> SignUpAsync(UserModels.SignUpRequest req)
     {
-        var context = new MgDashboardContext();
+        var accessKey = await _context.AccessKeys.FirstOrDefaultAsync(key => key.Key == req.AccessKey)
+                                      .ConfigureAwait(false);
 
-        var accessKey = await context.AccessKeys.FirstOrDefaultAsync(key => key.Key == user.AccessKey).ConfigureAwait(false);
-
-        if (accessKey is null)
+        if (accessKey is null || accessKey.Type is not KeyType.User and not KeyType.Admin)
         {
-            return false;
+            return null;
         }
 
-        var passwordHash = CreateHash(user.Password);
+        var passwordHash = CreateHash(req.Password);
 
-        await context.Users.AddAsync(
-                         new Entities.UserEntity
-                         {
-                             Id = Guid.NewGuid(),
-                             Name = user.Name,
-                             Password = passwordHash,
-                             AccessKeyId = accessKey.Id
-                         })
-                     .ConfigureAwait(false);
+        var role = accessKey.Type switch
+        {
+            KeyType.Admin => UserRole.Admin,
+            KeyType.User => UserRole.User,
+            _ => throw new InvalidOperationException("The type of given access key is not valid.")
+        };
 
-        await context.SaveChangesAsync().ConfigureAwait(false);
+        var user = new User
+        {
+            Id = Guid.NewGuid(),
+            Name = req.Name,
+            Password = passwordHash,
+            AccessKeyId = accessKey.Id,
+            Role = role
+        };
 
-        return true;
+        await _context.Users.AddAsync(user)
+                      .ConfigureAwait(false);
+
+        await _context.SaveChangesAsync().ConfigureAwait(false);
+
+        return new UserModels.SignInResponse
+        {
+            Id = user.Id,
+            Token = CreateToken(user.Name)
+        };
     }
 
-    private string CreateToken(User user)
+    private string CreateToken(string name)
     {
         var issuer = Environment.GetEnvironmentVariable("JWT_ISSUER");
         var audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE");
@@ -91,8 +109,8 @@ public sealed class UserService : IUserService
                 new[]
                 {
                     new Claim("Id", Guid.NewGuid().ToString()),
-                    new Claim(JwtRegisteredClaimNames.Sub, user.Name),
-                    new Claim(JwtRegisteredClaimNames.Email, user.Name),
+                    new Claim(JwtRegisteredClaimNames.Sub, name),
+                    new Claim(JwtRegisteredClaimNames.Email, name),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
                 }),
             Expires = DateTime.UtcNow.AddHours(1),

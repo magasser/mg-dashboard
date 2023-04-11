@@ -43,7 +43,7 @@ builder.Services
        .AddSwaggerGen()
        .AddDbContext<MgDashboardContext>(
            options => options.UseNpgsql(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")))
-       .AddSingleton<IUserService, UserService>();
+       .AddTransient<IUserService, UserService>();
 
 builder.Services
        .AddAuthorization()
@@ -76,6 +76,11 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+
+    app.UseDeveloperExceptionPage()
+       .UseCors(builder => builder.AllowAnyOrigin()
+                                  .AllowAnyHeader()
+                                  .AllowAnyMethod());
 }
 
 app.UseHttpsRedirection();

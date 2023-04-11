@@ -4,6 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "npm run config && ng serve",
+    "prod": "npm run config && ng serve --host 0.0.0.0 --port 4200",
     "build": "npm run config && ng build",
     "config": "npx ts-node src/environments/load-env.js",
     "watch": "npm run config && ng build --watch --configuration development",

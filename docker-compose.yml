@@ -9,10 +9,10 @@ services:
 
     working_dir: /home/website
     ports:
-      - 80:80
+      - 4200:4200
     volumes:
       - ./website/frontend/mg-dashboard:/home/website
-    command: sh -c 'npm install && npm run start'
+    command: sh -c 'npm install @angular/cli && npm install && npm run prod'
     restart: always
 
   api:
@@ -27,9 +27,10 @@ services:
     volumes:
       - ./api:/home/api/build
     ports:
-      - '5000:5000'
+      - 5000:5000
+      - 5001:5001
     environment:
-      ASPNETCORE_URLS: http://+:5000 
+      ASPNETCORE_URLS: https://+:5001;http://+:5000
     command: bash -c 'dotnet publish build/MG.Dashboard.Api/MG.Dashboard.Api.csproj -c Release -o app && dotnet app/MG.Dashboard.Api.dll'
     restart: always
 
@@ -55,7 +56,7 @@ services:
     env_file:
       - ./db/.env
     volumes:
-      - ./db/data:/var/lib/db/data
+      - ./db/data/persist:/var/lib/postgresql/data
     ports:
       - '5432:5432'
     restart: always

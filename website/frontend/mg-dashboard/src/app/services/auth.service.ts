@@ -29,9 +29,9 @@ export class AuthService {
     let url = `${this.endpoint}/user/signin`;
     return this.http.post(url, user).subscribe((res: any) => {
       localStorage.setItem('access_token', res.token);
-      this.getUserProfile(res._id).subscribe((res) => {
+      this.getUserProfile(res.id).subscribe((res) => {
         this.currentUser = res;
-        this.router.navigate(['user-profile/' + res.msg._id]);
+        this.router.navigate(['user-profile/' + res.id]);
       });
     });
   }
