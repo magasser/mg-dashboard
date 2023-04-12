@@ -1,10 +1,8 @@
 ﻿using MG.Dashboard.Api.Entities.Types;
-using System;
-using System.Collections.Generic;
 
 namespace MG.Dashboard.Api.Entities;
 
-public partial class User
+public class User
 {
     public Guid Id { get; set; }
 

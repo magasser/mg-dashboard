@@ -4,14 +4,13 @@ using MG.Dashboard.Api.Models;
 using MG.Dashboard.Api.Services;
 
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MG.Dashboard.Api.Controllers;
 
 [ApiController]
 [ApiVersion("1.0")]
-[Route("api/v{version:apiVersion}/user")]
+[Route("api/v{version:apiVersion}")]
 [Produces("application/json")]
 public class UserController : ControllerBase
 {
@@ -25,42 +24,42 @@ public class UserController : ControllerBase
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [HttpPost("signin")]
-    public async Task<ActionResult<UserModels.SignInResponse>> SignIn(
-        [Required] [FromBody] UserModels.SignInRequest req)
+    [HttpPost("user/login")]
+    public async Task<ActionResult<UserModels.Identification>> Login(
+        [Required] [FromBody] UserModels.Credentials credentials)
     {
-        var res = await _userService.SignInAsync(req);
+        var identification = await _userService.LoginAsync(credentials).ConfigureAwait(false);
 
-        if (res is null)
+        if (identification is null)
         {
             return Unauthorized();
         }
 
-        return Ok(res);
+        return Ok(identification);
     }
 
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [HttpPost("signup")]
-    public async Task<ActionResult<UserModels.SignInResponse>> SignUp([FromBody] UserModels.SignUpRequest req)
+    [HttpPost("user/register")]
+    public async Task<ActionResult<UserModels.Identification>> Register([FromBody] UserModels.Registration registration)
     {
-        var res = await _userService.SignUpAsync(req);
-        if (res is null)
+        var identification = await _userService.RegisterAsync(registration).ConfigureAwait(false);
+        if (identification is null)
         {
             return BadRequest();
         }
 
-        return CreatedAtAction(nameof(GetById), new { id = res.Id }, res);
+        return CreatedAtAction(nameof(GetById), new { id = identification.Id }, identification);
     }
 
     [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [HttpGet("{id}")]
-    public async Task<ActionResult<UserModels.UserResponse>> GetById([Required] Guid id)
+    [HttpGet("user/{id}")]
+    public async Task<ActionResult<UserModels.User>> GetById([Required] Guid id)
     {
-        var user = await _userService.GetByIdAsync(id);
+        var user = await _userService.GetByIdAsync(id).ConfigureAwait(false);
 
         if (user is null)
         {

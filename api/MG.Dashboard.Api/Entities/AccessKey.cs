@@ -1,11 +1,14 @@
-﻿using MG.Dashboard.Api.Entities.Types;
-using System;
-using System.Collections.Generic;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+using MG.Dashboard.Api.Entities.Types;
 
 namespace MG.Dashboard.Api.Entities;
 
-public partial class AccessKey
+public class AccessKey
 {
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
 
     public Guid Key { get; set; }

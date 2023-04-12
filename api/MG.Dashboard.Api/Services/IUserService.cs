@@ -1,12 +1,15 @@
-﻿using MG.Dashboard.Api.Models;
+﻿using MG.Dashboard.Api.Entities.Types;
+using MG.Dashboard.Api.Models;
 
 namespace MG.Dashboard.Api.Services;
 
 public interface IUserService
 {
-    Task<UserModels.UserResponse?> GetByIdAsync(Guid id);
+    Task<UserRole?> GetRoleAsync(Guid id);
 
-    Task<UserModels.SignInResponse?> SignInAsync(UserModels.SignInRequest req);
+    Task<UserModels.User?> GetByIdAsync(Guid id);
 
-    Task<UserModels.SignInResponse?> SignUpAsync(UserModels.SignUpRequest req);
+    Task<UserModels.Identification?> LoginAsync(UserModels.Credentials credentials);
+
+    Task<UserModels.Identification?> RegisterAsync(UserModels.Registration registration);
 }
