@@ -21,13 +21,14 @@ export class AuthService {
   constructor(private http: HttpClient, public router: Router) {}
 
   signUp(user: User): Observable<any> {
-    let url = `${this.endpoint}/user/signup`;
+    let url = `${this.endpoint}/user/register`;
     return this.http.post<any>(url, user).pipe(catchError(this.handleError));
   }
 
   signIn(user: User) {
-    let url = `${this.endpoint}/user/signin`;
+    let url = `${this.endpoint}/user/login`;
     return this.http.post(url, user).subscribe((res: any) => {
+      localStorage.setItem('id', res.id);
       localStorage.setItem('access_token', res.token);
       this.getUserProfile(res.id).subscribe((res) => {
         this.currentUser = res;
@@ -40,14 +41,19 @@ export class AuthService {
     return localStorage.getItem('access_token');
   }
 
+  getId() {
+    return localStorage.getItem('id');
+  }
+
   isLoggedIn(): boolean {
     let authToken = this.getToken();
     return authToken !== null;
   }
 
   logout() {
+    let removeId = localStorage.removeItem('id');
     let removeToken = localStorage.removeItem('access_token');
-    if (removeToken == null) {
+    if (removeToken == null && removeId == null) {
       this.router.navigate(['signin']);
     }
   }

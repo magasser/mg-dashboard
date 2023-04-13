@@ -1,0 +1,18 @@
+@use '../variables' as v;
+
+div {
+    background-color: v.$d-grey1;
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    
+    * {
+        margin-right: 15px;
+    }
+}
+
+.title {
+    color: v.$d-white3;
+    font-weight: bold;
+    margin: 1rem;
+}

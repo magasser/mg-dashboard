@@ -33,7 +33,7 @@ public class DeviceController : ControllerBase
     [HttpGet("device/{id}")]
     public async Task<ActionResult<DeviceModels.Device>> GetById([Required] Guid id)
     {
-        if (!!TryGetUserIdFromRequest(Request, out var userId))
+        if (!TryGetUserIdFromRequest(Request, out var userId))
         {
             Unauthorized();
         }

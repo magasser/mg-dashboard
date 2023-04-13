@@ -1,1 +1,65 @@
-/* You can add global styles to this file, and also import other style files */
+@use 'variables' as v;
+
+:root {
+    background-color: v.$d-grey2;
+    margin: 0;
+}
+
+html * {
+    font-family: 'Verdana';
+}
+
+.btn {
+    border: solid 2px v.$d-green5;
+    color: v.$d-white1;
+    background-color: v.$d-green5;
+    font-size: 1rem;
+    font-weight: bold;
+    padding: 10px;
+    border-radius: 10px;
+    text-decoration: none;
+
+    &:hover {
+        color: v.$d-white2;
+        background-color: v.$d-green3;
+    }
+}
+
+.btn-outline {
+    border: solid 2px v.$d-green5;
+    color: v.$d-green5;
+    background-color: v.$d-grey1;
+    font-size: 1rem;
+    font-weight: bold;
+    padding: 10px;
+    border-radius: 10px;
+    text-decoration: none;
+
+    &:hover {
+        color: v.$d-green3;
+        border-color: v.$d-green3;
+    }
+}
+
+.wrapper {
+    background-color: v.$d-grey2;
+    padding: 1rem;
+
+    .wrapper-group {
+        margin-bottom: 1rem;
+
+        label {
+            color: v.$d-white2;    
+        }
+
+        input {
+            display: block;
+            height: 3rem;
+            border-radius: 10px;
+            border: none;
+            padding-left: 10px;
+            width: 50%;
+            max-width: 500px;
+        }
+    }
+}

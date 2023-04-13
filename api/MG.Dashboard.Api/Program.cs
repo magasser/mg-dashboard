@@ -43,7 +43,9 @@ builder.Services
        .AddSwaggerGen()
        .AddDbContext<MgDashboardContext>(
            options => options.UseNpgsql(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")))
-       .AddTransient<IUserService, UserService>();
+       .AddScoped<IUserService, UserService>()
+       .AddScoped<IDeviceService, DeviceService>()
+       .AddSingleton<ITokenService, TokenService>();
 
 builder.Services
        .AddAuthorization()
@@ -77,13 +79,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 
-    app.UseDeveloperExceptionPage()
-       .UseCors(builder => builder.AllowAnyOrigin()
-                                  .AllowAnyHeader()
-                                  .AllowAnyMethod());
+    app.UseDeveloperExceptionPage();
 }
 
-app.UseHttpsRedirection();
+app.UseCors(builder => builder.AllowAnyOrigin()
+                              .SetIsOriginAllowed(_ => true)
+                              .AllowAnyHeader()
+                              .AllowAnyMethod());
 
 app.UseAuthentication()
    .UseAuthorization();
