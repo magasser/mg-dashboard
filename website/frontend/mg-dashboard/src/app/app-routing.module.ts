@@ -3,15 +3,21 @@ import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './guards/auth.guard';
 import { SigninComponent } from './components/signin/signin.component';
 import { SignupComponent } from './components/signup/signup.component';
-import { UserProfileComponent } from './components/user-profile/user-profile.component';
+import { HomeComponent } from './components/home/home.component';
+import { DeviceComponent } from './components/device/device.component';
 
 const routes: Routes = [
-  { path: '', pathMatch: 'full', canActivate: [AuthGuard] },
+  {
+    path: '',
+    component: HomeComponent,
+    pathMatch: 'full',
+    canActivate: [AuthGuard],
+  },
   { path: 'signin', component: SigninComponent },
   { path: 'signup', component: SignupComponent },
   {
-    path: 'user-profile/:id',
-    component: UserProfileComponent,
+    path: 'device/:id',
+    component: DeviceComponent,
     canActivate: [AuthGuard],
   },
 ];

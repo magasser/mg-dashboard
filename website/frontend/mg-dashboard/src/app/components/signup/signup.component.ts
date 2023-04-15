@@ -24,11 +24,6 @@ export class SignupComponent {
   }
 
   signUp() {
-    this.authService.signUp(this.signupForm.value).subscribe((res) => {
-      if (res.result) {
-        this.signupForm.reset();
-        this.router.navigate(['signin']);
-      }
-    });
+    this.authService.signUp(this.signupForm.value);
   }
 }

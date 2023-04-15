@@ -92,4 +92,6 @@ app.UseAuthentication()
 
 app.MapControllers();
 
+var t = Environment.GetEnvironmentVariables();
+
 app.Run();

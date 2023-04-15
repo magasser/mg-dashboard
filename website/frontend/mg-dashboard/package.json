@@ -3,11 +3,12 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "npm run config && ng serve",
-    "prod": "npm run config && ng serve --host 0.0.0.0 --port 4200",
-    "build": "npm run config && ng build",
+    "dev": "npm run config dev && ng serve",
+    "prod": "npm run config prod && ng serve --host 0.0.0.0 --port 4200",
+    "build-dev": "npm run config dev && ng build",
+    "build-prod": "npm run config prod && ng build",
     "config": "npx ts-node src/environments/load-env.js",
-    "watch": "npm run config && ng build --watch --configuration development",
+    "watch": "npm run config dev && ng build --watch --configuration development",
     "test": "ng test"
   },
   "private": true,
@@ -20,8 +21,10 @@
     "@angular/platform-browser": "^15.2.0",
     "@angular/platform-browser-dynamic": "^15.2.0",
     "@angular/router": "^15.2.0",
+    "@types/uuid": "^9.0.1",
     "bootstrap": "^5.2.3",
     "dotenv": "^16.0.3",
+    "ngx-mqtt": "^15.0.0-alpha.1",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.12.0"

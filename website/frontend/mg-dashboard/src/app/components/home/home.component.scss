@@ -1,0 +1,41 @@
+@use '../../../variables' as v;
+
+.list-container {
+    margin: 1rem 0;
+
+    :not(:last-child) {            
+        margin-bottom: 1rem;
+    }
+
+    .device-container {
+        display: flex;
+        max-width: 50%;
+        background-color: v.$d-white3;
+        border-radius: 5px;
+        height: 3rem;
+        align-items: center;
+        position: relative;
+        
+        .name {
+            font-size: large;
+            font-weight: bold;
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+        }
+
+        .type {
+            font-style: italic;
+            position: absolute;
+            top: 1rem;
+            left: 50%;
+        }
+
+        .btn-device {
+            height: 70%;
+            padding: 0 10px;
+            position: absolute;
+            right: 1rem;
+        }
+    }
+}

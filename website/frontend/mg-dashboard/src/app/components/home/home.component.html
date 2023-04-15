@@ -1,0 +1,13 @@
+<div class="wrapper">
+    <h3 class="area-title">My Devices</h3>
+    <ul *ngIf="devices.length !== 0; else noDevices" class="list-container">
+        <li *ngFor="let device of devices">
+            <div class="device-container">
+                <span class="name">{{ device.name }}</span>
+                <span class="type">{{ device.type }}</span>
+                <button class="btn btn-device" (click)="viewDevice(device)">View</button>
+            </div>
+        </li>
+    </ul>
+    <ng-template #noDevices><span class="text ">You have no devices.</span></ng-template>
+</div>

@@ -79,7 +79,7 @@ public sealed class UserService : IUserService
     public async Task<UserModels.Identification?> RegisterAsync(UserModels.Registration registration)
     {
         var key = await _context.AccessKeys
-                                .FindAsync(registration.AccessKey)
+                                .FirstOrDefaultAsync(key => key.Key == registration.AccessKey)
                                 .ConfigureAwait(false);
 
         if (key is null || key.Type is not KeyType.User and not KeyType.Admin)

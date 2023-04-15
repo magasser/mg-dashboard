@@ -12,7 +12,7 @@ public static class HttpRequestExtensions
             throw new ArgumentNullException(nameof(request));
         }
 
-        if (!request.Headers.TryGetValue("AccessToken", out var value))
+        if (!request.Headers.TryGetValue("Authorization", out var value))
         {
             return false;
         }

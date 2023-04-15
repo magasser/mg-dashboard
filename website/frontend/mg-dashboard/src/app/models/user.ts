@@ -1,6 +1,3 @@
 export class User {
-  _id!: String;
-  name!: String;
-  password!: String;
-  accessKey!: String;
+  constructor(public id: string, public name: string) {}
 }

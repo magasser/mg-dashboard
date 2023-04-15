@@ -29,6 +29,21 @@ public class DeviceController : ControllerBase
 
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [HttpGet("device/my")]
+    public async Task<ActionResult<IReadOnlyList<DeviceModels.Device>>> GetMy()
+    {
+        if (!TryGetUserIdFromRequest(Request, out var userId))
+        {
+            Unauthorized();
+        }
+
+        var devices = await _deviceService.GetByUserIdAsync(userId!.Value).ConfigureAwait(false);
+
+        return Ok(devices);
+    }
+
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpGet("device/{id}")]
     public async Task<ActionResult<DeviceModels.Device>> GetById([Required] Guid id)

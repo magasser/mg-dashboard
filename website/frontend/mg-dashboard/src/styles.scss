@@ -41,6 +41,11 @@ html * {
     }
 }
 
+.area-title {
+    color: v.$d-white2;
+    font-weight: bold;
+}
+
 .wrapper {
     background-color: v.$d-grey2;
     padding: 1rem;
@@ -62,4 +67,8 @@ html * {
             max-width: 500px;
         }
     }
+}
+
+.text {
+    color: v.$d-white2;
 }

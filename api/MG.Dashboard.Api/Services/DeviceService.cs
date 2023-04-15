@@ -90,7 +90,15 @@ public sealed class DeviceService : IDeviceService
             AccessKeyId = accessKey.Id
         };
 
+        var userDevice = new UserDevice
+        {
+            DeviceId = device.Id,
+            UserId = userId,
+            Role = DeviceRole.Owner
+        };
+
         await _context.Devices.AddAsync(device).ConfigureAwait(false);
+        await _context.UserDevices.AddAsync(userDevice).ConfigureAwait(false);
 
         await _context.SaveChangesAsync().ConfigureAwait(false);
 

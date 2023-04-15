@@ -1,6 +1,5 @@
 <div>
-  <h5 class="title">MG Dashboard</h5>
-  <a *ngIf="this.authService.isLoggedIn()" class="btn">User Profile</a>
+  <a class="title" routerLink="">MG Dashboard</a>
   <a *ngIf="!this.authService.isLoggedIn()" class="btn-outline" routerLink="/signin">Sign in</a>
   <a *ngIf="!this.authService.isLoggedIn()" class="btn" routerLink="/signup">Sign up</a>
   <button (click)="logout()" *ngIf="this.authService.isLoggedIn()" type="button" class="btn-outline">Logout</button>
