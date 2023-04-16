@@ -148,7 +148,7 @@ public sealed class MqttClientService : IMqttClientService, IDisposable
 
     private async Task EnqueueAsync(string topic, string payload)
     {
-        await _client.EnqueueAsync(topic, payload).ConfigureAwait(false);
+        await _client.EnqueueAsync(topic, payload, retain: true).ConfigureAwait(false);
 
         _logger.LogDebug("Enqueued message for topic '{Topic}' with payload '{Payload}.'", topic, payload);
     }

@@ -13,7 +13,7 @@ const loadEnv = () => {
 
   const envConfigFile = `export const environment = {
     apiUrl: '${process.env.API_URL}',
-    mqttConnectionUri: '${process.env.MQTT_CONNECTION_URI}',
+    mqttConnectionUrl: '${process.env.MQTT_CONNECTION_URL}',
     appVersion: '${appVersion}'
   };
   `;

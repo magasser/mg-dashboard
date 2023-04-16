@@ -1,0 +1,6 @@
+.vs
+logs
+MG.Dashboard.Api/bin
+MG.Dashboard.Api/obj
+MG.Dashboard.Api/.env.development
+MG.Dashboard.Api/appsettings.*.json

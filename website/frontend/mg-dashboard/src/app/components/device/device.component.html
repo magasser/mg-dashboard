@@ -1,0 +1,22 @@
+<h3 id="device-name" class="area-title">{{ device?.name ?? 'N/A'}}</h3>
+<div class="device-container">
+    <div class="info-container">
+        <div class="info-item">
+            <span>Type:</span>
+            <span>{{ device?.type ?? 'N/A' }}</span>
+        </div>
+        <div class="info-item">
+            <span>Connection:</span>
+            <span>{{ isConnected ? 'Connected' : 'Disconnected' }}</span>
+        </div>
+        <div class="info-item">
+            <span>State:</span>
+            <span>{{ state }}</span>
+        </div>
+        <div class="info-item">
+            <span>Mode:</span>
+            <span>{{ mode }}</span>
+        </div>
+    </div>
+    <app-car-twin *ngIf="device?.type == deviceType.Car" [twin$]="twin$"></app-car-twin>
+</div>

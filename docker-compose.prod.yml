@@ -8,9 +8,7 @@ networks:
 services:
   website:
     container_name: website.mg-dashboard
-    build:
-      context: ./website/frontend/mg-dashboard
-      dockerfile: Dockerfile
+    image: mg-dashboard-website
 
     ports:
       - 80:80
@@ -21,9 +19,7 @@ services:
 
   api:
     container_name: api.mg-dashboard
-    build:
-      context: ./api
-      dockerfile: Dockerfile
+    image: mg-dashboard-api
     depends_on:
       - database
 
@@ -36,9 +32,7 @@ services:
 
   mqtt:
     container_name: mqtt.mg-dashboard
-    build:
-      context: ./mqtt-server
-      dockerfile: Dockerfile
+    image: mg-dashboard-mqtt
     ports:
       - 1883:1883
       - 8083:8083

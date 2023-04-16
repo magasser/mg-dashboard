@@ -2,7 +2,7 @@
 
 public enum DeviceState
 {
-    Unkown = 0,
+    Unknown = 0,
     Running = 1,
     Error = 2
 }

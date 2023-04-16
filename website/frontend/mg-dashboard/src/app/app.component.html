@@ -1,7 +1,7 @@
 <div>
   <a class="title" routerLink="">MG Dashboard</a>
-  <a *ngIf="!this.authService.isLoggedIn()" class="btn-outline" routerLink="/signin">Sign in</a>
-  <a *ngIf="!this.authService.isLoggedIn()" class="btn" routerLink="/signup">Sign up</a>
-  <button (click)="logout()" *ngIf="this.authService.isLoggedIn()" type="button" class="btn-outline">Logout</button>
+  <a *ngIf="!this.authService.isLoggedIn" class="btn-outline" routerLink="/signin">Sign in</a>
+  <a *ngIf="!this.authService.isLoggedIn" class="btn" routerLink="/signup">Sign up</a>
+  <button (click)="logout()" *ngIf="this.authService.isLoggedIn" type="button" class="btn-outline">Logout</button>
 </div>
 <router-outlet></router-outlet>

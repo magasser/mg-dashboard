@@ -1,0 +1,35 @@
+@use '../../../variables' as v;
+
+#device-name {
+    margin: 1rem;
+}
+
+.device-container {
+    margin: 1rem;
+    padding: 1rem;
+    background-color: v.$d-white2;
+    border-radius: 10px;
+
+    .info-container {
+        margin: 1rem 0;
+        max-width: 40%;
+    
+        :not(:last-child) {
+            margin-bottom: 1rem;
+        }
+    
+        .info-item {
+            position: relative;
+    
+            :first-child {
+    
+            }
+    
+            :last-child {
+                position: absolute;
+                left: 60%;       
+                font-weight: bold;
+            }
+        }
+    }
+}

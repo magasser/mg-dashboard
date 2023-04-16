@@ -23,7 +23,7 @@ export class AuthService {
 
   constructor(private http: HttpClient, public router: Router) {}
 
-  signUp(registration: UserRegistration): Subscription {
+  public signUp(registration: UserRegistration): Subscription {
     let url = `${this.endpoint}/user/register`;
     return this.http
       .post<Identification>(url, registration)
@@ -38,7 +38,7 @@ export class AuthService {
       });
   }
 
-  signIn(credentials: Credentials): Subscription {
+  public signIn(credentials: Credentials): Subscription {
     let url = `${this.endpoint}/user/login`;
     return this.http.post<Identification>(url, credentials).subscribe((res) => {
       localStorage.setItem('id', res.id);
@@ -51,21 +51,19 @@ export class AuthService {
     });
   }
 
-  getToken(): string | null {
+  public get token(): string | null {
     return localStorage.getItem('access_token');
   }
 
-  getId(): string | null {
+  public get id(): string | null {
     return localStorage.getItem('id');
   }
 
-  isLoggedIn(): boolean {
-    const token = this.getToken();
-    const id = this.getToken();
-    return token !== null && id !== null;
+  public get isLoggedIn(): boolean {
+    return this.token !== null && this.id !== null;
   }
 
-  logout(): void {
+  public logout(): void {
     const removeId = localStorage.removeItem('id');
     const removeToken = localStorage.removeItem('access_token');
     if (removeToken == null && removeId == null) {
@@ -73,14 +71,12 @@ export class AuthService {
     }
   }
 
-  getUser(): Observable<User> {
+  public getUser(): Observable<User> {
     if (this.currentUser) {
       return of<User>(this.currentUser);
     }
 
-    const id = this.getId();
-
-    const url = `${this.endpoint}/user/${id}`;
+    const url = `${this.endpoint}/user/${this.id}`;
     return this.http.get<User>(url, { headers: this.headers }).pipe(
       map((res) => {
         return res || {};

@@ -1,0 +1,6 @@
+.vs
+logs
+MG.Dashboard.Mqtt.Server/bin
+MG.Dashboard.Mqtt.Server/obj
+MG.Dashboard.Mqtt.Server/.env.development
+MG.Dashboard.Mqtt.Server/appsettings.*.json
