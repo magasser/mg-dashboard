@@ -1,0 +1,18 @@
+<div class="info-container">
+    <div class="info-item">
+        <span>Type:</span>
+        <span>{{ device?.type ?? 'N/A' }}</span>
+    </div>
+    <div class="info-item">
+        <span>Connection:</span>
+        <span>{{ isConnected ? 'Connected' : 'Disconnected' }}</span>
+    </div>
+    <div class="info-item">
+        <span>State:</span>
+        <span>{{ state }}</span>
+    </div>
+    <div class="info-item">
+        <span>Mode:</span>
+        <span>{{ mode }}</span>
+    </div>
+</div>

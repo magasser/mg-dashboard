@@ -9,7 +9,7 @@ import { AuthService } from 'src/app/services/auth.service';
   styleUrls: ['./signup.component.scss'],
 })
 export class SignupComponent {
-  signupForm: FormGroup;
+  public signupForm: FormGroup;
 
   constructor(
     public formBuilder: FormBuilder,
@@ -23,7 +23,7 @@ export class SignupComponent {
     });
   }
 
-  signUp() {
+  public signUp() {
     this.authService.signUp(this.signupForm.value);
   }
 }

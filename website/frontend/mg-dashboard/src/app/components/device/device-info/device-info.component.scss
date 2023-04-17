@@ -1,0 +1,18 @@
+.info-container {
+    margin: 1rem 0;
+    max-width: 40%;
+
+    :not(:last-child) {
+        margin-bottom: 1rem;
+    }
+
+    .info-item {
+        position: relative;
+
+        :last-child {
+            position: absolute;
+            left: 60%;       
+            font-weight: bold;
+        }
+    }
+}

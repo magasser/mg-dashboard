@@ -1,0 +1,57 @@
+@use '../../../../variables' as v;
+
+.car-container {
+    margin: 1rem;
+    padding: 1rem;
+    background-color: v.$d-white2;
+    border-radius: 10px;
+
+
+    .keys-container {
+        display: grid;
+        grid-template-rows: 3rem 3rem;
+        grid-template-columns: 3rem 3rem 3rem;
+        grid-gap: .5rem;
+        padding: .5rem;
+        width: fit-content;
+        border: solid v.$d-grey3 2px;
+        border-radius: 10px;
+
+        .key {
+            background-color: v.$d-grey4;
+            width: 3rem;
+            height: 3rem;
+            font-weight: bold;
+            border: solid v.$d-grey3 2px;
+            border-radius: 5px;
+        }
+
+        .key-active {
+            background-color: v.$d-green1;
+        }
+
+        #w {
+            grid-row-start: 1;
+            grid-column-start: 2;
+        }
+
+        #a {
+            grid-row-start: 2;
+            grid-column-start: 1;
+        }
+
+        #s {
+            grid-row-start: 2;
+            grid-column-start: 2;
+        }
+
+        #d {
+            grid-row-start: 2;
+            grid-column-start: 3;
+        }
+    }
+        
+    .keys-container:focus {
+        background-color: v.$d-white4;
+    }
+}

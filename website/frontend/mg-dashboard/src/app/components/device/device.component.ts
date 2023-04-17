@@ -14,26 +14,14 @@ import { DeviceService } from 'src/app/services/device.service';
   styleUrls: ['./device.component.scss'],
 })
 export class DeviceComponent implements OnInit, OnDestroy {
-  private subscriptions: Subscription[];
-
-  public twin$?: Observable<any>;
   public device?: Device;
-  public isConnected: boolean;
-  public state: DeviceState;
-  public mode: DeviceMode;
   public deviceType = DeviceType;
 
   constructor(
+    public deviceClient: DeviceClientService,
     private deviceService: DeviceService,
-    private deviceClient: DeviceClientService,
     private route: ActivatedRoute
-  ) {
-    this.isConnected = false;
-    this.subscriptions = [];
-
-    this.state = DeviceState.Unknown;
-    this.mode = DeviceMode.Unknown;
-  }
+  ) {}
 
   async ngOnInit(): Promise<void> {
     const deviceId = this.route.snapshot.paramMap.get('id');
@@ -45,25 +33,9 @@ export class DeviceComponent implements OnInit, OnDestroy {
     this.device = await firstValueFrom(this.deviceService.get(deviceId));
 
     this.deviceClient.start(deviceId);
-
-    this.subscriptions.push(
-      this.deviceClient.isConnected.subscribe((isConnected) => {
-        this.isConnected = isConnected;
-      }),
-      this.deviceClient.state$.subscribe((state) => {
-        this.state = state;
-      }),
-      this.deviceClient.mode$.subscribe((mode) => {
-        this.mode = mode;
-      })
-    );
-
-    this.twin$ = this.deviceClient.twin$;
   }
-  ngOnDestroy(): void {
-    this.subscriptions.forEach((s) => s.unsubscribe());
-    this.subscriptions = [];
 
+  ngOnDestroy(): void {
     this.deviceClient.stop();
   }
 }

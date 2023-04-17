@@ -5,7 +5,14 @@ import {
   MqttConnectionState,
   MqttService,
 } from 'ngx-mqtt';
-import { BehaviorSubject, Observable, Subject, Subscription, map } from 'rxjs';
+import {
+  BehaviorSubject,
+  Observable,
+  Subject,
+  Subscription,
+  firstValueFrom,
+  map,
+} from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { DeviceState } from '../models/device-state';
 import { DeviceMode } from '../models/device-mode';
@@ -41,7 +48,7 @@ export class DeviceClientService {
     this.twinSubject = new Subject<any>();
   }
 
-  public get isConnected(): Observable<boolean> {
+  public get isConnected$(): Observable<boolean> {
     return this.isConnectedSubject$.asObservable();
   }
 
@@ -90,8 +97,10 @@ export class DeviceClientService {
       throw new Error('Client has to be connected to send message.');
     }
 
-    const topic = `${this.deviceId}/${Topics.MESSAGE}`;
-    this.mqttService.publish(topic, message);
+    const topic = `${this.deviceId}${Topics.MESSAGE}`;
+    firstValueFrom(this.mqttService.publish(topic, message)).catch((err) => {
+      console.error(err);
+    });
   }
 
   private onConnectionStateChanged(state: MqttConnectionState): void {

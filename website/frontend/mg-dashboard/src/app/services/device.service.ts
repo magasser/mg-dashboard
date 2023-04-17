@@ -15,13 +15,14 @@ import { DeviceType } from '../models/device-type';
   providedIn: 'root',
 })
 export class DeviceService {
-  private endpoint: string = environment.apiUrl;
-  private headers = new HttpHeaders().set('Content-Type', 'application/json');
+  private _endpoint: string = environment.apiUrl;
+  private _headers = new HttpHeaders().set('Content-Type', 'application/json');
+
   constructor(private http: HttpClient, private router: Router) {}
 
   public get(id: string): Observable<Device> {
-    const url = `${this.endpoint}/device/${id}`;
-    return this.http.get<Device>(url, { headers: this.headers }).pipe(
+    const url = `${this._endpoint}/device/${id}`;
+    return this.http.get<Device>(url, { headers: this._headers }).pipe(
       map((res) => {
         if (res) {
           res.type = this.getDeviceType(res.type);
@@ -45,8 +46,8 @@ export class DeviceService {
   }
 
   public getMy(): Observable<Device[]> {
-    const url = `${this.endpoint}/device/my`;
-    return this.http.get<Device[]>(url, { headers: this.headers }).pipe(
+    const url = `${this._endpoint}/device/my`;
+    return this.http.get<Device[]>(url, { headers: this._headers }).pipe(
       map((res) => {
         if (res) {
           res.forEach((d) => {
@@ -61,7 +62,7 @@ export class DeviceService {
   }
 
   public register(registration: Registration) {
-    const url = `${this.endpoint}/device/register`;
+    const url = `${this._endpoint}/device/register`;
     return this.http
       .post<Device>(url, registration)
       .subscribe((res: Device) => {

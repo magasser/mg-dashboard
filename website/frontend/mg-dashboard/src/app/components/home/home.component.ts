@@ -10,10 +10,11 @@ import { DeviceService } from 'src/app/services/device.service';
   styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent implements OnInit {
-  devices: Device[] = [];
+  public devices: Device[] = [];
+
   constructor(private deviceService: DeviceService, private router: Router) {}
 
-  async ngOnInit(): Promise<void> {
+  public async ngOnInit(): Promise<void> {
     this.devices = await firstValueFrom(this.deviceService.getMy());
   }
 

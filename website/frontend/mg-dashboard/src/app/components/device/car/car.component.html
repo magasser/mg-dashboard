@@ -1,0 +1,9 @@
+<div class="car-container">
+    <app-device-info [device]="device" [device]="device" [deviceClient]="deviceClient"></app-device-info>
+    <div tabindex="0" class="keys-container" (focusout)="controlFocusOut($event)" (keydown)="controlKeyDown($event)" (keyup)="controlKeyUp($event)" #controls>
+        <button [ngClass]="moveKey === 'w' ? 'key-active' : ''" id="w" class="key">W</button>
+        <button [ngClass]="steerKey === 'a' ? 'key-active' : ''" id="a" class="key">A</button>
+        <button [ngClass]="moveKey === 's' ? 'key-active' : ''" id="s"class="key">S</button>
+        <button [ngClass]="steerKey === 'd' ? 'key-active' : ''" id="d" class="key">D</button>
+    </div>
+</div>

@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./signin.component.scss'],
 })
 export class SigninComponent {
-  signinForm: FormGroup;
+  public signinForm: FormGroup;
 
   constructor(
     public formBuilder: FormBuilder,
@@ -22,7 +22,7 @@ export class SigninComponent {
     });
   }
 
-  signIn() {
+  public signIn() {
     this.authService.signIn(this.signinForm.value);
   }
 }

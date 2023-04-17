@@ -17,14 +17,14 @@ import { UserRegistration } from '../models/user-registration';
   providedIn: 'root',
 })
 export class AuthService {
-  private endpoint: string = environment.apiUrl;
-  private headers = new HttpHeaders().set('Content-Type', 'application/json');
-  private currentUser?: User;
+  private _endpoint: string = environment.apiUrl;
+  private _headers = new HttpHeaders().set('Content-Type', 'application/json');
+  private _currentUser?: User;
 
   constructor(private http: HttpClient, public router: Router) {}
 
   public signUp(registration: UserRegistration): Subscription {
-    let url = `${this.endpoint}/user/register`;
+    let url = `${this._endpoint}/user/register`;
     return this.http
       .post<Identification>(url, registration)
       .subscribe((res) => {
@@ -32,20 +32,20 @@ export class AuthService {
         localStorage.setItem('access_token', res.token);
 
         this.getUser().subscribe((res) => {
-          this.currentUser = res;
+          this._currentUser = res;
           this.router.navigate(['']);
         });
       });
   }
 
   public signIn(credentials: Credentials): Subscription {
-    let url = `${this.endpoint}/user/login`;
+    let url = `${this._endpoint}/user/login`;
     return this.http.post<Identification>(url, credentials).subscribe((res) => {
       localStorage.setItem('id', res.id);
       localStorage.setItem('access_token', res.token);
 
       this.getUser().subscribe((res) => {
-        this.currentUser = res;
+        this._currentUser = res;
         this.router.navigate(['']);
       });
     });
@@ -72,12 +72,12 @@ export class AuthService {
   }
 
   public getUser(): Observable<User> {
-    if (this.currentUser) {
-      return of<User>(this.currentUser);
+    if (this._currentUser) {
+      return of<User>(this._currentUser);
     }
 
-    const url = `${this.endpoint}/user/${this.id}`;
-    return this.http.get<User>(url, { headers: this.headers }).pipe(
+    const url = `${this._endpoint}/user/${this.id}`;
+    return this.http.get<User>(url, { headers: this._headers }).pipe(
       map((res) => {
         return res || {};
       }),

@@ -10,9 +10,10 @@ import { SignupComponent } from './components/signup/signup.component';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { HomeComponent } from './components/home/home.component';
 import { DeviceComponent } from './components/device/device.component';
-import { CarTwinComponent } from './components/device/car-twin/car-twin.component';
 import { MQTT_SERVICE_OPTIONS } from './services/device-client.service';
 import { MqttModule } from 'ngx-mqtt';
+import { CarComponent } from './components/device/car/car.component';
+import { DeviceInfoComponent } from './components/device/device-info/device-info.component';
 
 @NgModule({
   declarations: [
@@ -21,7 +22,8 @@ import { MqttModule } from 'ngx-mqtt';
     SignupComponent,
     HomeComponent,
     DeviceComponent,
-    CarTwinComponent,
+    CarComponent,
+    DeviceInfoComponent,
   ],
   imports: [
     BrowserModule,

@@ -7,11 +7,11 @@ import { AuthService } from './services/auth.service';
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
-  title = 'mg-dashboard';
+  public title = 'mg-dashboard';
 
   constructor(public authService: AuthService) {}
 
-  logout(): void {
+  public logout(): void {
     this.authService.logout();
   }
 }
