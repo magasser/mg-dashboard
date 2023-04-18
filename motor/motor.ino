@@ -51,7 +51,11 @@ void serialEvent() {
 
 void executeCommand(const Message& command) {  
   if (controller.execute(command.parameters, command.parameterCount)) {
-    sendAckMessage(command.type + PARAMETER_SEPARATOR + command.parameters[0]);
+    String message = command.type;
+    for (int i = 0; i < command.parameterCount; i++) {
+      message += String(PARAMETER_SEPARATOR) + command.parameters[i];
+    }
+    sendAckMessage(message);
   }
 }
 

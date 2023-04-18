@@ -1,5 +1,7 @@
 ﻿using System.Reactive.Linq;
+using System.Text.Json;
 
+using MG.Dashboard.Controller.Converter;
 using MG.Dashboard.Controller.Domain;
 using MG.Dashboard.Controller.Mqtt;
 using MG.Dashboard.Controller.Options;
@@ -15,9 +17,11 @@ public sealed class DeviceService : IDeviceService
     private readonly DeviceConfiguration _configuration;
     private readonly ISerialService _serialService;
     private readonly IMqttClientService _mqttClientService;
+    private readonly JsonSerializerOptions _serializerOptions;
 
     private bool _isSerialConnected;
     private bool _isMqttConnected;
+    private DeviceTwin? _twin;
 
     public DeviceService(
         ILogger<DeviceService> logger,
@@ -30,13 +34,30 @@ public sealed class DeviceService : IDeviceService
         _serialService = serialService ?? throw new ArgumentNullException(nameof(serialService));
         _mqttClientService = mqttClientService ?? throw new ArgumentNullException(nameof(mqttClientService));
 
-        _serialService.IsConnected.Subscribe(isConnected => _isSerialConnected = isConnected);
+        _serializerOptions = new JsonSerializerOptions() { Converters = { new DeviceTwinJsonConverter() } };
+
+        _serialService.IsConnected.Subscribe(isConnected =>
+        {
+            _isSerialConnected = isConnected;
+
+            var state = _isSerialConnected ? DeviceState.Running : DeviceState.Error;
+
+            _ = _mqttClientService.PublishAsync($"{_configuration.Id}{DeviceTopics.State}", $"{(int)state}");
+        });
         _mqttClientService.IsConnected.Subscribe(isConnected => _isMqttConnected = isConnected);
 
         DeviceMessages = _serialService.Messages
                                        .Select(Message.FromString);
         ExternalMessages = _mqttClientService.SubscribeTopic($"{_configuration.Id}{DeviceTopics.Message}")
                                              .Select(Message.FromString);
+
+        UpdateTwin(DeviceTwin.Create(_configuration.Id, _configuration.Name, _configuration.Type));
+
+        DeviceMessages.Subscribe(
+                          message =>
+                          {
+                              UpdateTwin(_twin!.Update(message));
+                          });
     }
 
     /// <inheritdoc />
@@ -86,5 +107,12 @@ public sealed class DeviceService : IDeviceService
         await _mqttClientService.StopAsync(cancellationToken).ConfigureAwait(false);
 
         _logger.LogDebug("Stopped device service.");
+    }
+
+    private void UpdateTwin(DeviceTwin twin)
+    {
+        _twin = twin;
+        var json = JsonSerializer.Serialize(twin, _serializerOptions);
+        _ = _mqttClientService.PublishAsync($"{_configuration.Id}{DeviceTopics.Twin}", json);
     }
 }

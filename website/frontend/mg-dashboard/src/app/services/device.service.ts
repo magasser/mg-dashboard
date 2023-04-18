@@ -34,11 +34,11 @@ export class DeviceService {
   }
   private getDeviceType(type: DeviceType | number): DeviceType {
     switch (type) {
-      case 0:
-        return DeviceType.Car;
       case 1:
-        return DeviceType.Drone;
+        return DeviceType.Car;
       case 2:
+        return DeviceType.Drone;
+      case 3:
         return DeviceType.Boat;
       default:
         return DeviceType.Unknown;

@@ -182,7 +182,7 @@ public sealed class SerialService : ISerialService, IDisposable
     private async Task RunConnectionWatchdogAsync(CancellationToken cancellationToken)
     {
         var connectionTimeout = TimeSpan.FromMilliseconds(_configuration.ConnectionTimeout);
-        var connectionCheckDelay = TimeSpan.FromMilliseconds(_configuration.ConnectionTimeout / 10);
+        var connectionCheckDelay = TimeSpan.FromMilliseconds(_configuration.ConnectionTimeout / 5);
 
         while (!cancellationToken.IsCancellationRequested)
         {

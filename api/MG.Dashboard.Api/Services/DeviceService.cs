@@ -35,7 +35,8 @@ public sealed class DeviceService : IDeviceService
                    ? new DeviceModels.Device
                    {
                        Id = device.Id,
-                       Name = device.Name
+                       Name = device.Name,
+                       Type = device.Type
                    }
                    : null;
     }
@@ -50,7 +51,8 @@ public sealed class DeviceService : IDeviceService
                                  ud => new DeviceModels.Device
                                  {
                                      Id = ud.DeviceId,
-                                     Name = ud.Device.Name
+                                     Name = ud.Device.Name,
+                                     Type = ud.Device.Type
                                  })
                              .ToListAsync();
     }
@@ -63,7 +65,8 @@ public sealed class DeviceService : IDeviceService
                                  d => new DeviceModels.Device
                                  {
                                      Id = d.Id,
-                                     Name = d.Name
+                                     Name = d.Name,
+                                     Type = d.Type
                                  })
                              .ToListAsync();
     }

@@ -1,4 +1,4 @@
-﻿namespace MG.Dashboard.Api.Entities.Types;
+﻿namespace MG.Dashboard.Controller.Domain;
 
 public enum DeviceType
 {
