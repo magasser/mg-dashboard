@@ -1,6 +1,6 @@
 ﻿namespace MG.Dashboard.Api.Extensions;
 
-public static class HttpRequestExtensions
+internal static class HttpRequestExtensions
 {
     private const string BearerPrefix = "Bearer ";
 

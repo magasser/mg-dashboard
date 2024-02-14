@@ -1,9 +1,12 @@
 ﻿using MG.Dashboard.Controller;
+using MG.Dashboard.Controller.Camera;
 using MG.Dashboard.Controller.Device;
 using MG.Dashboard.Controller.Mqtt;
 using MG.Dashboard.Controller.Options;
 using MG.Dashboard.Controller.Serial;
 using MG.Dashboard.Env;
+
+using MMALSharp;
 
 using Serilog;
 
@@ -25,6 +28,8 @@ await Host.CreateDefaultBuilder()
                                      .AddSingleton<IDeviceService, DeviceService>()
                                      .AddSingleton<IMqttClientService, MqttClientService>()
                                      .AddSingleton<ISerialService, SerialService>()
+                                     .AddSingleton<ICameraService, CameraService>()
+                                     .AddSingleton<ICamera, PiCamera>()
                                      .AddHostedService<ControlService>())
           .ConfigureLogging(
               (context, loggingBuilder) =>

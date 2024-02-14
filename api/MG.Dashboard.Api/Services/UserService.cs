@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using System.Net;
+using System.Security.Cryptography;
 using System.Text;
 
 using MG.Dashboard.Api.Context;
@@ -22,7 +23,19 @@ public sealed class UserService : IUserService
     }
 
     /// <inheritdoc />
-    public async Task<UserRole?> GetRoleAsync(Guid id)
+    public async Task<ServiceResult<UserRole>> GetRoleAsync(Guid id)
+    {
+        var user = await _context.Users
+                                 .FindAsync(id)
+                                 .ConfigureAwait(false);
+
+        return user is not null
+                   ? ServiceResult.Success(user.Role)
+                   : ServiceResult.Failure<UserRole>(HttpStatusCode.NotFound, "User for id not found.");
+    }
+
+    /// <inheritdoc />
+    public async Task<ServiceResult<UserModels.User>> GetByIdAsync(Guid id)
     {
         var user = await _context.Users
                                  .FindAsync(id)
@@ -33,30 +46,18 @@ public sealed class UserService : IUserService
             return null;
         }
 
-        return user.Role;
+        return user is not null
+                   ? ServiceResult.Success(
+                       new UserModels.User
+                       {
+                           Id = user.Id,
+                           Name = user.Name
+                       })
+                   : ServiceResult.Failure<UserModels.User>(HttpStatusCode.NotFound, "User for id not found.");
     }
 
     /// <inheritdoc />
-    public async Task<UserModels.User?> GetByIdAsync(Guid id)
-    {
-        var user = await _context.Users
-                                 .FindAsync(id)
-                                 .ConfigureAwait(false);
-
-        if (user is null)
-        {
-            return null;
-        }
-
-        return new UserModels.User
-        {
-            Id = user.Id,
-            Name = user.Name
-        };
-    }
-
-    /// <inheritdoc />
-    public async Task<UserModels.Identification?> LoginAsync(UserModels.Credentials credentials)
+    public async Task<ServiceResult<UserModels.Identification>> LoginAsync(UserModels.Credentials credentials)
     {
         var passwordHash = CreateHash(credentials.Password);
 
@@ -67,24 +68,34 @@ public sealed class UserService : IUserService
                                  .ConfigureAwait(false);
 
         return data is not null
-                   ? new UserModels.Identification
-                   {
-                       Id = data!.Id,
-                       Token = _tokenService.CreateToken(credentials.Name, data.Id)
-                   }
-                   : null;
+                   ? ServiceResult.Success(
+                       new UserModels.Identification
+                       {
+                           Id = data!.Id,
+                           Token = _tokenService.CreateToken(credentials.Name, data.Id)
+                       })
+                   : ServiceResult.Failure<UserModels.Identification>(
+                       HttpStatusCode.Unauthorized,
+                       "Invalid user credentials.");
     }
 
     /// <inheritdoc />
-    public async Task<UserModels.Identification?> RegisterAsync(UserModels.Registration registration)
+    public async Task<ServiceResult<UserModels.Identification>> RegisterAsync(UserModels.Registration registration)
     {
         var key = await _context.AccessKeys
                                 .FirstOrDefaultAsync(key => key.Key == registration.AccessKey)
                                 .ConfigureAwait(false);
 
-        if (key is null || key.Type is not KeyType.User and not KeyType.Admin)
+        if (key is null)
         {
-            return null;
+            return ServiceResult.Failure<UserModels.Identification>(HttpStatusCode.NotFound, "Access key not found.");
+        }
+
+        if (key.Type is not KeyType.User and not KeyType.Admin)
+        {
+            return ServiceResult.Failure<UserModels.Identification>(
+                HttpStatusCode.Unauthorized,
+                "Invalid access key for user registration.");
         }
 
         var passwordHash = CreateHash(registration.Password);
@@ -93,7 +104,7 @@ public sealed class UserService : IUserService
         {
             KeyType.Admin => UserRole.Admin,
             KeyType.User => UserRole.User,
-            _ => throw new InvalidOperationException("The type of given access accessKey is not valid.")
+            _ => throw new InvalidOperationException($"The given access '{key.Type}' is not valid.")
         };
 
         var user = new User
@@ -108,13 +119,22 @@ public sealed class UserService : IUserService
         await _context.Users.AddAsync(user)
                       .ConfigureAwait(false);
 
-        await _context.SaveChangesAsync().ConfigureAwait(false);
-
-        return new UserModels.Identification
+        try
         {
-            Id = user.Id,
-            Token = _tokenService.CreateToken(registration.Name, user.Id)
-        };
+            await _context.SaveChangesAsync().ConfigureAwait(false);
+        }
+        catch (DbUpdateException ex)
+        {
+            return ServiceResult.Failure<UserModels.Identification>(HttpStatusCode.Conflict, ex.Message);
+        }
+
+        return ServiceResult.Success(
+            HttpStatusCode.Created,
+            new UserModels.Identification
+            {
+                Id = user.Id,
+                Token = _tokenService.CreateToken(registration.Name, user.Id)
+            });
     }
 
     private string CreateHash(string password)

@@ -11,7 +11,7 @@ public sealed class DeviceModels
         [Required]
         public Guid Id { get; set; }
 
-        [Required(AllowEmptyStrings = true)]
+        [Required(AllowEmptyStrings = false)]
         public string Name { get; set; }
 
         [Required]

@@ -6,11 +6,11 @@ public interface IDeviceService
 {
     Task<bool> HasAccessAsync(Guid deviceId, Guid userId);
 
-    Task<DeviceModels.Device?> GetByIdAsync(Guid id);
+    Task<ServiceResult<DeviceModels.Device>> GetByIdAsync(Guid id);
 
-    Task<IReadOnlyList<DeviceModels.Device>> GetByUserIdAsync(Guid userId);
+    Task<ServiceResult<IReadOnlyList<DeviceModels.Device>>> GetByUserIdAsync(Guid userId);
 
-    Task<IReadOnlyList<DeviceModels.Device>> GetAllAsync();
+    Task<ServiceResult<IReadOnlyList<DeviceModels.Device>>> GetAllAsync();
 
-    Task<DeviceModels.Device> RegisterAsync(DeviceModels.Registration registration, Guid userId);
+    Task<ServiceResult<DeviceModels.Device>> RegisterAsync(DeviceModels.Registration registration, Guid userId);
 }

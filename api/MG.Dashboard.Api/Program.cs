@@ -40,7 +40,7 @@ builder.Services
                options.DefaultApiVersion = new ApiVersion(1, 0);
            })
        .AddEndpointsApiExplorer()
-       .AddSwaggerGen()
+       .AddSwaggerGen(options => options.CustomSchemaIds(type => type.FullName))
        .AddDbContext<MgDashboardContext>(
            options => options.UseNpgsql(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")))
        .AddScoped<IUserService, UserService>()
@@ -91,7 +91,5 @@ app.UseAuthentication()
    .UseAuthorization();
 
 app.MapControllers();
-
-var t = Environment.GetEnvironmentVariables();
 
 app.Run();

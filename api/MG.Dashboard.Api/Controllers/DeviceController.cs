@@ -14,7 +14,7 @@ namespace MG.Dashboard.Api.Controllers;
 [ApiVersion("1.0")]
 [Route("api/v{version:apiVersion}")]
 [Produces("application/json")]
-public class DeviceController : ControllerBase
+public class DeviceController : MgController
 {
     private readonly IUserService _userService;
     private readonly IDeviceService _deviceService;
@@ -37,9 +37,7 @@ public class DeviceController : ControllerBase
             Unauthorized();
         }
 
-        var devices = await _deviceService.GetByUserIdAsync(userId!.Value).ConfigureAwait(false);
-
-        return Ok(devices);
+        return FromResult(await _deviceService.GetByUserIdAsync(userId!.Value).ConfigureAwait(false));
     }
 
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -58,14 +56,7 @@ public class DeviceController : ControllerBase
             return Forbid();
         }
 
-        var device = await _deviceService.GetByIdAsync(id).ConfigureAwait(false);
-
-        if (device is null)
-        {
-            return NotFound();
-        }
-
-        return Ok(device);
+        return FromResult(await _deviceService.GetByIdAsync(id).ConfigureAwait(false));
     }
 
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -80,14 +71,7 @@ public class DeviceController : ControllerBase
             return Unauthorized();
         }
 
-        var device = await _deviceService.RegisterAsync(registration, userId!.Value).ConfigureAwait(false);
-
-        if (device is null)
-        {
-            return BadRequest();
-        }
-
-        return CreatedAtAction(nameof(GetById), new { id = device.Id }, device);
+        return FromResult(await _deviceService.RegisterAsync(registration, userId!.Value).ConfigureAwait(false));
     }
 
     private bool TryGetUserIdFromRequest(HttpRequest request, out Guid? userId)

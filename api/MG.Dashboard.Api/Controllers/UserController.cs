@@ -12,7 +12,7 @@ namespace MG.Dashboard.Api.Controllers;
 [ApiVersion("1.0")]
 [Route("api/v{version:apiVersion}")]
 [Produces("application/json")]
-public class UserController : ControllerBase
+public class UserController : MgController
 {
     private readonly IUserService _userService;
 
@@ -28,29 +28,17 @@ public class UserController : ControllerBase
     public async Task<ActionResult<UserModels.Identification>> Login(
         [Required] [FromBody] UserModels.Credentials credentials)
     {
-        var identification = await _userService.LoginAsync(credentials).ConfigureAwait(false);
-
-        if (identification is null)
-        {
-            return Unauthorized();
-        }
-
-        return Ok(identification);
+        return FromResult(await _userService.LoginAsync(credentials).ConfigureAwait(false));
     }
 
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     [HttpPost("user/register")]
     public async Task<ActionResult<UserModels.Identification>> Register([FromBody] UserModels.Registration registration)
     {
-        var identification = await _userService.RegisterAsync(registration).ConfigureAwait(false);
-        if (identification is null)
-        {
-            return BadRequest();
-        }
-
-        return CreatedAtAction(nameof(GetById), new { id = identification.Id }, identification);
+        return FromResult(await _userService.RegisterAsync(registration).ConfigureAwait(false));
     }
 
     [Authorize]
@@ -59,13 +47,6 @@ public class UserController : ControllerBase
     [HttpGet("user/{id}")]
     public async Task<ActionResult<UserModels.User>> GetById([Required] Guid id)
     {
-        var user = await _userService.GetByIdAsync(id).ConfigureAwait(false);
-
-        if (user is null)
-        {
-            return NotFound();
-        }
-
-        return Ok(user);
+        return FromResult(await _userService.GetByIdAsync(id).ConfigureAwait(false));
     }
 }
